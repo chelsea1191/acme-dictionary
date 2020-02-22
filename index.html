@@ -1,79 +1,86 @@
 <html>
   <head>
-    <link rel='stylesheet' href='/assets/styles.css' />
-    <script src='https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.js'></script>
+    <link rel="stylesheet" href="assets/styles.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.js"></script>
     <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
-    <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
-    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
-    <script src='https://cdnjs.cloudflare.com/ajax/libs/react-router-dom/5.0.0/react-router-dom.js'></script>
+    <script
+      src="https://unpkg.com/react@16/umd/react.development.js"
+      crossorigin
+    ></script>
+    <script
+      src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"
+      crossorigin
+    ></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-router-dom/5.0.0/react-router-dom.js"></script>
+    <script src="server.js"></script>
   </head>
   <body>
-    <div id='root'></div>
-    <script type='text/babel'>
+    <div id="root"></div>
+    <script type="text/babel">
       const { useState, useEffect } = React;
 
-      const List = ({ words, type, destroyWord })=> {
+      const List = ({ words, type, destroyWord }) => {
         return (
           <section>
-            <h2>{ type }</h2>
+            <h2>{type}</h2>
             <ul>
-              {
-                words.map( word => {
-                  return (
-                    <li key={ word.id}>
-                      { word.name }
-                      <button onClick={ ()=> destroyWord(type, word)}>x</button>
-                    </li> 
-                  );
-                })
-              }
+              {words.map(word => {
+                return (
+                  <li key={word.id}>
+                    {word.name}
+                    <button onClick={() => destroyWord(type, word)}>x</button>
+                  </li>
+                );
+              })}
             </ul>
           </section>
         );
       };
-      const App = ()=> {
+      const App = () => {
         const [nouns, setNouns] = useState([]);
         const [verbs, setVerbs] = useState([]);
         const [adjectives, setAdjectives] = useState([]);
-        useEffect(()=> {
+        useEffect(() => {
           Promise.all([
-            axios.get('/api/nouns'),
-            axios.get('/api/verbs'),
-            axios.get('/api/adjectives'),
+            axios.get("/api/nouns"),
+            axios.get("/api/verbs"),
+            axios.get("/api/adjectives")
           ])
-          .then( responses => responses.map( response => response.data))
-          .then( results => {
-            setNouns(results[0]);
-            setVerbs(results[1]);
-            setAdjectives(results[2]);
-          });
+            .then(responses => responses.map(response => response.data))
+            .then(results => {
+              setNouns(results[0]);
+              setVerbs(results[1]);
+              setAdjectives(results[2]);
+            });
         }, []);
-        const destroyWord = (type, word)=> {
-          axios.delete(`/api/${type}/${word.id}`)
-            .then( response => response.data )
-            .then( () => {
-              if(type === 'nouns'){
-                setNouns(nouns.filter( n => n.id !== word.id));
+        const destroyWord = (type, word) => {
+          axios
+            .delete(`/api/${type}/${word.id}`)
+            .then(response => response.data)
+            .then(() => {
+              if (type === "nouns") {
+                setNouns(nouns.filter(n => n.id !== word.id));
               }
-              if(type === 'verbs'){
-                setVerbs(verbs.filter( n => n.id !== word.id));
+              if (type === "verbs") {
+                setVerbs(verbs.filter(n => n.id !== word.id));
               }
-              if(type === 'adjectives'){
-                setAdjectives(adjectives.filter( n => n.id !== word.id));
+              if (type === "adjectives") {
+                setAdjectives(adjectives.filter(n => n.id !== word.id));
               }
             });
         };
-        const generateWord = (type)=> {
-          axios.post(`/api/${type}`)
-            .then( response => response.data )
-            .then( word => {
-              if(type === 'nouns'){
+        const generateWord = type => {
+          axios
+            .post(`/api/${type}`)
+            .then(response => response.data)
+            .then(word => {
+              if (type === "nouns") {
                 setNouns([...nouns, word]);
               }
-              if(type === 'verbs'){
+              if (type === "verbs") {
                 setVerbs([...verbs, word]);
               }
-              if(type === 'adjectives'){
+              if (type === "adjectives") {
                 setAdjectives([...adjectives, word]);
               }
             });
@@ -82,19 +89,29 @@
           <div>
             <h1>Acme Dictionary</h1>
             <nav>
-              <button onClick={ ()=> generateWord('nouns')}>Generate Noun ({ nouns.length })</button>
-              <button onClick={ ()=> generateWord('verbs')}>Generate Verb ({ verbs.length })</button>
-              <button onClick={ ()=> generateWord('adjectives')}>Generate Adjective ({ adjectives.length })</button>
+              <button onClick={() => generateWord("nouns")}>
+                Generate Noun ({nouns.length})
+              </button>
+              <button onClick={() => generateWord("verbs")}>
+                Generate Verb ({verbs.length})
+              </button>
+              <button onClick={() => generateWord("adjectives")}>
+                Generate Adjective ({adjectives.length})
+              </button>
             </nav>
             <main>
-              <List words={ nouns } type='nouns' destroyWord={ destroyWord}/>
-              <List words={ verbs } type='verbs' destroyWord={ destroyWord }/>
-              <List words={ adjectives } destroyWord={ destroyWord} type='adjectives'/>
+              <List words={nouns} type="nouns" destroyWord={destroyWord} />
+              <List words={verbs} type="verbs" destroyWord={destroyWord} />
+              <List
+                words={adjectives}
+                destroyWord={destroyWord}
+                type="adjectives"
+              />
             </main>
           </div>
         );
       };
-      const root = document.querySelector('#root');
+      const root = document.querySelector("#root");
       ReactDOM.render(<App />, root);
     </script>
   </body>

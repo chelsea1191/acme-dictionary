@@ -5,16 +5,16 @@ const path = require("path");
 app.use(express.json());
 const bodyParser = require("body-parser");
 app.use(bodyParser.json());
-//app.use("/assets", express.static("assets"));
+app.use("/assets", express.static("assets"));
 
-// app.get("/", (req, res, next) =>
-//   res.sendFile(path.join(__dirname, "index.html"))
-// );
+app.get("/", (req, res, next) =>
+  res.sendFile(path.join(__dirname, "index.html"))
+);
 
 //////////////////////////////////////get////////////////////////////////
 app.get("/api/verbs", async (req, res, next) => {
   await db
-    .readDepartments()
+    .readVerbs()
     .then(verbs => res.send(verbs))
     .catch(next);
 });
@@ -26,7 +26,7 @@ app.get("/api/nouns", async (req, res, next) => {
 });
 app.get("/api/adjectives", async (req, res, next) => {
   await db
-    .readUsers()
+    .readAdjectives()
     .then(adjectives => res.send(adjectives))
     .catch(next);
 });
@@ -59,7 +59,7 @@ app.delete("/api/verbs/:id", (req, res, next) => {
     .then(() => res.sendStatus(204)) //since no return
     .catch(next);
 });
-app.delete("/api/nouns/:id", (req, res, next) => {
+app.delete("/api/adjectives/:id", (req, res, next) => {
   db.deleteAdjective(req.params.id)
     .then(() => res.sendStatus(204)) //since no return
     .catch(next);

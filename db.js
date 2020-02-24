@@ -1,6 +1,4 @@
 const pg = require("pg");
-const { Client } = pg;
-const uuid = require("uuid/v4");
 const client = new pg.Client("postgres://localhost/words");
 const faker = require("faker");
 client.connect();
@@ -39,7 +37,19 @@ const sync = async () => {
 //////////////create
 const createNoun = async () => {
   const SQL = `INSERT INTO nouns (word) VALUES ($1) returning *;`;
-  const word = faker.random.word();
+  const word = faker.hacker.noun();
+  const response = await client.query(SQL, [word]);
+  return response.rows[0];
+};
+const createVerb = async () => {
+  const SQL = `INSERT INTO verbs (word) VALUES ($1) returning *;`;
+  const word = faker.hacker.verb();
+  const response = await client.query(SQL, [word]);
+  return response.rows[0];
+};
+const createAdjective = async () => {
+  const SQL = `INSERT INTO adjectives (word) VALUES ($1) returning *;`;
+  const word = faker.hacker.adjective();
   const response = await client.query(SQL, [word]);
   return response.rows[0];
 };
@@ -50,25 +60,40 @@ const readNouns = async () => {
   const response = await client.query(SQL);
   return response.rows;
 };
+const readVerbs = async () => {
+  const SQL = `SELECT * FROM verbs;`;
+  const response = await client.query(SQL);
+  return response.rows;
+};
+const readAdjectives = async () => {
+  const SQL = `SELECT * FROM adjectives;`;
+  const response = await client.query(SQL);
+  return response.rows;
+};
 
 ////////////delete
 const deleteNoun = async id => {
   const SQL = `DELETE FROM nouns WHERE (id) = ($1);`;
   await client.query(SQL, [id]);
 };
+const deleteVerb = async id => {
+  const SQL = `DELETE FROM verbs WHERE (id) = ($1);`;
+  await client.query(SQL, [id]);
+};
+const deleteAdjective = async id => {
+  const SQL = `DELETE FROM adjectives WHERE (id) = ($1);`;
+  await client.query(SQL, [id]);
+};
 
 module.exports = {
-  sync
-  // createNoun,
-  // createVerb,
-  // createAdjective,
-  // readNouns,
-  // readVerbs,
-  // readAdjectives,
-  // updateNoun,
-  // updateVerb,
-  // updateAdjective,
-  // deleteNoun,
-  // deleteVerb,
-  // deleteAdjective
+  sync,
+  createNoun,
+  createVerb,
+  createAdjective,
+  readNouns,
+  readVerbs,
+  readAdjectives,
+  deleteNoun,
+  deleteVerb,
+  deleteAdjective
 };
